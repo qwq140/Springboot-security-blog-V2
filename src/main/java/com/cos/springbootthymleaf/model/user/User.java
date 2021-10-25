@@ -29,7 +29,7 @@ public class User {
     private String username;
     private String password;
     private String email;
-    private String nickName;
+    private String nickname;
     private String roles;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")

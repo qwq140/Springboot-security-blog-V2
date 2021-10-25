@@ -8,14 +8,14 @@ public class JoinReqDto {
     private String username;
     private String password;
     private String email;
-    private String nickName;
+    private String nickname;
 
     public User toEntity(){
         return User.builder()
                 .username(username)
                 .password(password)
                 .email(email)
-                .nickName(nickName)
+                .nickname(nickname)
                 .build();
     }
 

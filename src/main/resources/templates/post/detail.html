@@ -28,7 +28,7 @@
         <div class="collapse navbar-collapse" id="mynavbar">
             <ul sec:authorize-expr="isAuthenticated()" class="navbar-nav me-auto">
                 <li class="nav-item"><a class="nav-link" href="/post/saveForm">글쓰기</a></li>
-                <li class="nav-item"><a class="nav-link" href="/user/1">회원정보보기</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{'/user/'+${#authentication.principal.user.id}}">회원정보보기</a></li>
                 <li class="nav-item"><a class="nav-link" href="/logout">로그아웃</a></li>
             </ul>
             <ul sec:authorize-expr="!isAuthenticated()" class="navbar-nav me-auto">
@@ -60,14 +60,80 @@
             <div th:text="${post.content}"></div>
         </div>
     </div>
+    <br/>
     <!-- 댓글 시작 -->
+    <div class="card">
+        <form>
+            <div class="card-body">
+                <textarea id="reply-content" class="form-control" rows="1"></textarea>
+            </div>
+            <div class="card-footer">
+                <button type="button" id="btn-reply-save" th:value="${post.id }" class="btn btn-success">등록</button>
+            </div>
+        </form>
+    </div>
+    <br />
+
+    <div class="card">
+        <div class="card-header">댓글 리스트</div>
+        <ul id="reply-box" class="list-group">
+                <li th:each="reply : ${post.replies}" id="reply-${reply.id }" class="list-group-item d-flex justify-content-between">
+                    <div th:text="${reply.content}"></div> <!-- 레이징로딩 시작 - 이유는 getter 호출되니까 (세션이 열려있음 open in view 모드에서만) -->
+                    <div class="d-flex">
+                        <div class="font-italic" th:text="'작성자 : '+${reply.user.username }"></div>
+                        <button th:if="${reply.user.id == #authentication.principal.user.id}" th:onclick="deleteReply(${reply.id})" class="badge">삭제</button>
+                    </div>
+                </li>
+            </c:forEach>
+        </ul>
+    </div>
+    <!-- 댓글 끝 -->
 </div>
 <script>
-    console.log("테스트");
+    // 댓글 등록
+    $("#btn-reply-save").on("click", (e)=>{
+
+        let data = {
+            content:$("#reply-content").val(),
+            postId:e.currentTarget.value
+        }
+
+        $.ajax({
+            type:"POST",
+            url:"/reply",
+            data:JSON.stringify(data),
+            contentType:"application/json; charset=utf-8",
+            dataType:"json"
+        }).done((res)=> {
+            console.log(res);
+            if (res.code === 1) {
+                history.go(0);
+            } else {
+                alert("댓글 등록에 실패하셨습니다.");
+            }
+        });
+    });
+
+    // 댓글 삭제
+    // for문으로 중첩되는 것들은 리스너가 아닌 onClick으로
+    function deleteReply(id){
+        $.ajax({
+            type:"DELETE",
+            url:"/reply/"+id,
+            dataType:"json"
+        }).done((res)=>{
+            console.log(res);
+            if(res.code===1){
+                $("#reply-"+id).remove();
+            } else {
+                alert("삭제에 실패하였습니다.");
+            }
+        });
+    }
+
+    // 글 삭제
     $("#btn-delete").on("click", (e)=>{
-        console.log("삭제버튼 클릭");
         let id = e.currentTarget.value;
-        console.log(id);
 
         $.ajax({
             type:"DELETE",

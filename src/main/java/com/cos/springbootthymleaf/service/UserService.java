@@ -2,6 +2,7 @@ package com.cos.springbootthymleaf.service;
 
 import com.cos.springbootthymleaf.model.user.User;
 import com.cos.springbootthymleaf.model.user.UserRepository;
+import com.cos.springbootthymleaf.web.dto.JoinReqDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,4 +23,19 @@ public class UserService {
         user.setRoles("ROLE_USER");
         userRepository.save(user);
     }
+
+    @Transactional
+    public User 회원수정(JoinReqDto dto, int id){
+        User userEntity = userRepository.findById(id).get();
+        System.out.println("회원수정 서비스 : "+userEntity);
+        System.out.println("dto : "+dto);
+        String encPassword = bCryptPasswordEncoder.encode(dto.getPassword());
+
+        userEntity.setPassword(encPassword);
+        userEntity.setEmail(dto.getEmail());
+        userEntity.setNickname(dto.getNickname());
+        System.out.println("회원수정 서비스 : "+userEntity);
+        return userEntity;
+    }
+
 }
