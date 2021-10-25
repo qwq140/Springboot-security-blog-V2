@@ -26,15 +26,14 @@ public class UserService {
 
     @Transactional
     public User 회원수정(JoinReqDto dto, int id){
-        User userEntity = userRepository.findById(id).get();
-        System.out.println("회원수정 서비스 : "+userEntity);
-        System.out.println("dto : "+dto);
+        User userEntity = userRepository.findById(id).orElseThrow(()->{
+            throw new IllegalArgumentException("해당 유저를 찾을 수 없습니다.");
+        });
         String encPassword = bCryptPasswordEncoder.encode(dto.getPassword());
 
         userEntity.setPassword(encPassword);
         userEntity.setEmail(dto.getEmail());
         userEntity.setNickname(dto.getNickname());
-        System.out.println("회원수정 서비스 : "+userEntity);
         return userEntity;
     }
 

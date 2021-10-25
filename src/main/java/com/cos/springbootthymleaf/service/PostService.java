@@ -29,12 +29,16 @@ public class PostService {
     }
 
     public Post 글상세보기(int id){
-        return postRepository.findById(id).get();
+        return postRepository.findById(id).orElseThrow(()->{
+            throw new IllegalArgumentException("해당 글을 찾을 수 없습니다.");
+        });
     }
 
     @Transactional
     public void 글수정하기(PostSaveReqDto dto, int id){
-        Post postEntity = postRepository.findById(id).get();
+        Post postEntity = postRepository.findById(id).orElseThrow(()->{
+            throw new IllegalArgumentException("해당 글을 찾을 수 없습니다.");
+        });
         postEntity.setTitle(dto.getTitle());
         postEntity.setContent(dto.getContent());
     }
